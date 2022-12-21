@@ -1,15 +1,19 @@
 using DG.Tweening;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static ToonyColorsPro.ShaderGenerator.Enums;
 
-public class ProgressController : MyBaseBehaviour
+public class ProgressController : MyBaseBehaviour, IInteract
 {
-       [SerializeField] private GameObject unlockProgressObj;
-       [SerializeField] private Image progressBar;
-       [SerializeField] private TextMeshProUGUI dollarAmount;
-       [SerializeField] private int deskPrice,deskRemainPrice;
-       [SerializeField] private float ProgressValue;
+    ObjectType o_type = ObjectType.WorkAreaActive;
+
+    [SerializeField] private GameObject unlockProgressObj;
+    [SerializeField] private Image progressBar;
+    [SerializeField] private TextMeshProUGUI dollarAmount;
+    [SerializeField] private int deskPrice, deskRemainPrice;
+    [SerializeField] private float ProgressValue;
     
     void Start()
     {
@@ -17,9 +21,9 @@ public class ProgressController : MyBaseBehaviour
         deskRemainPrice = deskPrice;
     }
 
-    private void OnTriggerStay(Collider other)
+    private void GetProgressController()
     {
-        if (other.CompareTag("Player") && PlayerPrefs.GetInt("money") > 0)
+        if (PlayerPrefs.GetInt("money") > 0)
         {
             Debug.Log("Workin is progress");
 
@@ -48,9 +52,21 @@ public class ProgressController : MyBaseBehaviour
             }
         }
     }
-
     private float CalculateMoney()
     {
         return deskRemainPrice - PlayerPrefs.GetInt("dollar");
+    }
+
+    public void Interact(ObjectType type, Transform _transform, Action<ObjectType, Transform> action)
+    {
+        switch (type)
+        {
+            case ObjectType.Player:
+                GetProgressController();
+                action.Invoke(o_type, transform);
+                break;
+            default:
+                break;
+        }
     }
 }
